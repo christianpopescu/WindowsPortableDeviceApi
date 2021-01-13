@@ -88,17 +88,19 @@ void DisplayGuidProperty(
     }
 }
 
-void ShowPropertiesForElement(IPortableDevice* pDevice, HRESULT& hr, WCHAR szSelection[81], CComPtr<IPortableDeviceProperties> pProperties, CComPtr<IPortableDeviceValues> pObjectProperties, CComPtr<IPortableDeviceContent> pContent, CComPtr<IPortableDeviceKeyCollection> pPropertiesToRead)
+void ShowPropertiesForElement(IPortableDevice* pDevice,  WCHAR szSelection[81])
 {
+    CComPtr<IPortableDeviceProperties>    pProperties;
+    CComPtr<IPortableDeviceValues>        pObjectProperties;
+    CComPtr<IPortableDeviceContent>       pContent;
+    CComPtr<IPortableDeviceKeyCollection> pPropertiesToRead;
+
 	// 1) Get an IPortableDeviceContent interface from the IPortableDevice interface to
 	// access the content-specific methods.
-	if (SUCCEEDED(hr))
+	HRESULT hr = pDevice->Content(&pContent);
+	if (FAILED(hr))
 	{
-		hr = pDevice->Content(&pContent);
-		if (FAILED(hr))
-		{
-			printf("! Failed to get IPortableDeviceContent from IPortableDevice, hr = 0x%lx\n",hr);
-		}
+		printf("! Failed to get IPortableDeviceContent from IPortableDevice, hr = 0x%lx\n",hr);
 	}
 
 	// 2) Get an IPortableDeviceProperties interface from the IPortableDeviceContent interface
@@ -195,10 +197,7 @@ void ReadContentProperties(
 
     HRESULT                               hr               = S_OK;
     WCHAR                                 szSelection[81]  = {0};
-    CComPtr<IPortableDeviceProperties>    pProperties;
-    CComPtr<IPortableDeviceValues>        pObjectProperties;
-    CComPtr<IPortableDeviceContent>       pContent;
-    CComPtr<IPortableDeviceKeyCollection> pPropertiesToRead;
+
 
     // Prompt user to enter an object identifier on the device to read properties from.
     printf("Enter the identifier of the object you wish to read properties from.\n>");
@@ -210,7 +209,7 @@ void ReadContentProperties(
 
     if (SUCCEEDED(hr))
     {
-        ShowPropertiesForElement(pDevice, hr, szSelection, pProperties, pObjectProperties, pContent, pPropertiesToRead);
+        ShowPropertiesForElement(pDevice, szSelection);
     }
 }
 
