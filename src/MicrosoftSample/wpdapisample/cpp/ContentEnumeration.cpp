@@ -13,9 +13,12 @@
 //<SnippetContentEnum2>
 #define NUM_OBJECTS_TO_REQUEST  10
 
+void ShowPropertiesForElement(IPortableDevice* pDevice, PCWSTR szSelection);
+
 // Recursively called function which enumerates using the specified
 // object identifier as the parent.
 void RecursiveEnumerate(
+    IPortableDevice* pDevice,
     PCWSTR                  pszObjectID,
     IPortableDeviceContent* pContent)
 {
@@ -23,6 +26,7 @@ void RecursiveEnumerate(
 
     // Print the object identifier being used as the parent during enumeration.
     printf("%ws\n",pszObjectID);
+    ShowPropertiesForElement(pDevice, pszObjectID);
 
     // Get an IEnumPortableDeviceObjectIDs interface by calling EnumObjects with the
     // specified parent object identifier.
@@ -49,7 +53,7 @@ void RecursiveEnumerate(
             // Remember to free all returned object identifiers using CoTaskMemFree()
             for (DWORD dwIndex = 0; dwIndex < cFetched; dwIndex++)
             {
-                RecursiveEnumerate(szObjectIDArray[dwIndex],pContent);
+                RecursiveEnumerate(pDevice,szObjectIDArray[dwIndex],pContent);
 
                 // Free allocated PWSTRs after the recursive enumeration call has completed.
                 CoTaskMemFree(szObjectIDArray[dwIndex]);
@@ -86,7 +90,7 @@ void EnumerateAllContent(
     if (SUCCEEDED(hr))
     {
         printf("\n");
-        RecursiveEnumerate(WPD_DEVICE_OBJECT_ID, pContent);
+        RecursiveEnumerate(pDevice, WPD_DEVICE_OBJECT_ID, pContent);
     }
 }
 //</SnippetContentEnum1>
@@ -352,4 +356,101 @@ void ReadHintLocations(
     }
 }
 
+
+void ShowPropertiesForElement(IPortableDevice* pDevice, PCWSTR szSelection)
+{
+    CComPtr<IPortableDeviceProperties>    pProperties;
+    CComPtr<IPortableDeviceValues>        pObjectProperties;
+    CComPtr<IPortableDeviceContent>       pContent;
+    CComPtr<IPortableDeviceKeyCollection> pPropertiesToRead;
+
+    // 1) Get an IPortableDeviceContent interface from the IPortableDevice interface to
+    // access the content-specific methods.
+    HRESULT hr = pDevice->Content(&pContent);
+    if (FAILED(hr))
+    {
+        printf("! Failed to get IPortableDeviceContent from IPortableDevice, hr = 0x%lx\n", hr);
+    }
+
+    // 2) Get an IPortableDeviceProperties interface from the IPortableDeviceContent interface
+    // to access the property-specific methods.
+    if (SUCCEEDED(hr))
+    {
+        hr = pContent->Properties(&pProperties);
+        if (FAILED(hr))
+        {
+            printf("! Failed to get IPortableDeviceProperties from IPortableDevice, hr = 0x%lx\n", hr);
+        }
+    }
+
+    // 3) CoCreate an IPortableDeviceKeyCollection interface to hold the the property keys
+    // we wish to read.
+    //<SnippetContentProp1>
+    hr = CoCreateInstance(CLSID_PortableDeviceKeyCollection,
+        NULL,
+        CLSCTX_INPROC_SERVER,
+        IID_PPV_ARGS(&pPropertiesToRead));
+    if (SUCCEEDED(hr))
+    {
+        // 4) Populate the IPortableDeviceKeyCollection with the keys we wish to read.
+        // NOTE: We are not handling any special error cases here so we can proceed with
+        // adding as many of the target properties as we can.
+        if (pPropertiesToRead != NULL)
+        {
+            HRESULT hrTemp = S_OK;
+            hrTemp = pPropertiesToRead->Add(WPD_OBJECT_PARENT_ID);
+            if (FAILED(hrTemp))
+            {
+                printf("! Failed to add WPD_OBJECT_PARENT_ID to IPortableDeviceKeyCollection, hr= 0x%lx\n", hrTemp);
+            }
+
+            hrTemp = pPropertiesToRead->Add(WPD_OBJECT_NAME);
+            if (FAILED(hrTemp))
+            {
+                printf("! Failed to add WPD_OBJECT_NAME to IPortableDeviceKeyCollection, hr= 0x%lx\n", hrTemp);
+            }
+
+            hrTemp = pPropertiesToRead->Add(WPD_OBJECT_PERSISTENT_UNIQUE_ID);
+            if (FAILED(hrTemp))
+            {
+                printf("! Failed to add WPD_OBJECT_PERSISTENT_UNIQUE_ID to IPortableDeviceKeyCollection, hr= 0x%lx\n", hrTemp);
+            }
+
+            hrTemp = pPropertiesToRead->Add(WPD_OBJECT_FORMAT);
+            if (FAILED(hrTemp))
+            {
+                printf("! Failed to add WPD_OBJECT_FORMAT to IPortableDeviceKeyCollection, hr= 0x%lx\n", hrTemp);
+            }
+
+            hrTemp = pPropertiesToRead->Add(WPD_OBJECT_CONTENT_TYPE);
+            if (FAILED(hrTemp))
+            {
+                printf("! Failed to add WPD_OBJECT_CONTENT_TYPE to IPortableDeviceKeyCollection, hr= 0x%lx\n", hrTemp);
+            }
+        }
+    }
+    //</SnippetContentProp1>
+    // 5) Call GetValues() passing the collection of specified PROPERTYKEYs.
+    //<SnippetContentProp2>
+    if (SUCCEEDED(hr))
+    {
+        hr = pProperties->GetValues(szSelection,         // The object whose properties we are reading
+            pPropertiesToRead,   // The properties we want to read
+            &pObjectProperties); // Driver supplied property values for the specified object
+        if (FAILED(hr))
+        {
+            printf("! Failed to get all properties for object '%ws', hr= 0x%lx\n", szSelection, hr);
+        }
+    }
+    //</SnippetContentProp2>
+    // 6) Display the returned property values to the user
+    if (SUCCEEDED(hr))
+    {
+        DisplayStringProperty(pObjectProperties, WPD_OBJECT_PARENT_ID, L"WPD_OBJECT_PARENT_ID");
+        DisplayStringProperty(pObjectProperties, WPD_OBJECT_NAME, L"WPD_OBJECT_NAME");
+        DisplayStringProperty(pObjectProperties, WPD_OBJECT_PERSISTENT_UNIQUE_ID, L"WPD_OBJECT_PERSISTENT_UNIQUE_ID");
+        DisplayGuidProperty(pObjectProperties, WPD_OBJECT_CONTENT_TYPE, L"WPD_OBJECT_CONTENT_TYPE");
+        DisplayGuidProperty(pObjectProperties, WPD_OBJECT_FORMAT, L"WPD_OBJECT_FORMAT");
+    }
+}
 
