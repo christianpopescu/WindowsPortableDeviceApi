@@ -199,10 +199,12 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="WpdApiSample.cpp" />
+    <ClCompile Include="WrapperClass\CPortableDeviceManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CommonFunctions.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="WrapperClass\CPortableDeviceManager.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
