@@ -2,6 +2,10 @@
 #include "../stdafx.h"
 class CPortableDeviceManager
 {
-public:
+
+	private:
+	CPortableDeviceManager();
+	public:
+		static CPortableDeviceManager GetCPortableDeviceManager();
 	int EnumerateAllDevices() const;
 };
