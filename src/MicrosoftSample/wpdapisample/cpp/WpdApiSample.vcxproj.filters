@@ -45,6 +45,9 @@
     <ClCompile Include="WrapperClass\CPortableDeviceManager.cpp">
       <Filter>WrapperClass</Filter>
     </ClCompile>
+    <ClCompile Include="WrapperException.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CommonFunctions.h">
@@ -55,6 +58,9 @@
     </ClInclude>
     <ClInclude Include="WrapperClass\CPortableDeviceManager.h">
       <Filter>WrapperClass</Filter>
+    </ClInclude>
+    <ClInclude Include="WrapperException.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
