@@ -202,13 +202,13 @@
     </ClCompile>
     <ClCompile Include="WpdApiSample.cpp" />
     <ClCompile Include="WrapperClass\CPortableDeviceManager.cpp" />
-    <ClCompile Include="WrapperException.cpp" />
+    <ClCompile Include="WrapperClass\WrapperException.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CommonFunctions.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="WrapperClass\CPortableDeviceManager.h" />
-    <ClInclude Include="WrapperException.h" />
+    <ClInclude Include="WrapperClass\WrapperException.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />

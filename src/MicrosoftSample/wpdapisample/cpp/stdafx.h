@@ -41,6 +41,7 @@
 #include <specstrings.h>
 #include <commdlg.h>
 #include <new>
+#include <memory>
 
 #ifndef IID_PPV_ARGS
 #define IID_PPV_ARGS(ppType) __uuidof(**(ppType)), (static_cast<IUnknown *>(*(ppType)),reinterpret_cast<void**>(ppType))

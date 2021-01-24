@@ -10,10 +10,10 @@ class CPortableDeviceManager
 	public:
 		CPortableDeviceManager(CPortableDeviceManager& cpdm) = delete;
 		CPortableDeviceManager& operator=(CPortableDeviceManager& cpdm) = delete;
-		CPortableDeviceManager(CPortableDeviceManager&& cpdm) = default;
-		CPortableDeviceManager& operator=(CPortableDeviceManager&& cpdm) = default;
+//		CPortableDeviceManager(CPortableDeviceManager&& cpdm) = default;
+//		CPortableDeviceManager& operator=(CPortableDeviceManager&& cpdm) = default;
 
 		// Factory method
-		static CPortableDeviceManager GetCPortableDeviceManager();
+		static std::unique_ptr<CPortableDeviceManager> GetCPortableDeviceManager();
 		int EnumerateAllDevices() const;
 };
